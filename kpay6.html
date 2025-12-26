@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Request Status</title>
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
+      background: #f4f4f5;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* كونتينر عام عشان ما يتمدد الصندوق كثير */
+    .wrapper {
+      width: 100%;
+      padding: 24px 12px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* الصندوق الرئيسي */
+    .box {
+      background: #ffffff;
+      width: 100%;
+      max-width: 360px;          /* هنا ضيّقت العرض */
+      padding: 26px 20px 28px;
+      border-radius: 18px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    .icon-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #ffe4e4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 16px;
+    }
+
+    .icon-circle span {
+      font-size: 34px;
+      color: #d00000;
+      font-weight: 700;
+      line-height: 0;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 8px;
+    }
+
+    p {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .btn-main {
+      width: 100%;
+      background: #0070f3;
+      color: white;
+      padding: 11px 0;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 22px;
+      transition: background 0.15s ease;
+    }
+
+    .btn-main:hover {
+      background: #005ad4;
+    }
+
+    @media (max-width: 360px) {
+      .box {
+        padding: 22px 16px 24px;
+        border-radius: 16px;
+      }
+
+      h2 {
+        font-size: 17px;
+      }
+
+      p {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <div class="box">
+      <div class="icon-circle">
+        <span>✖</span>
+      </div>
+
+      <h2>Your request has not been completed.</h2>
+
+      <p>تم رفض طلبك بسبب وجود خطأ في المعلومات المدخلة يرجى الضغط على إعادة المحاولة لإتمام طلبك</p>
+
+      <button class="btn-main" onclick="window.location.href='kpay1.html';">
+        Try again 
+      </button>
+    </div>
+  </div>
+</body>
+</html>
